@@ -55,7 +55,6 @@ function cleanOldFeedback() {
   if (data.feedback.length !== before) saveData();
 }
 
-// ВХОД ИЛИ РЕГИСТРАЦИЯ ОДНИМ ДЕЙСТВИЕМ
 app.post('/api/login', (req, res) => {
   const { nick } = req.body || {};
   if (typeof nick !== 'string') return res.status(400).json({ error: 'Введите ник' });
@@ -98,7 +97,6 @@ app.get('/api/leaderboard', (req, res) => {
   res.json({ leaderboard: list });
 });
 
-// ОТЗЫВЫ
 app.get('/api/feedback', auth, (req, res) => {
   cleanOldFeedback();
   const now = Date.now();
