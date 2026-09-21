@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Block Blast — by charodeychikmsm</title>
+<title>ИГРА ТОП ВСЕМ ИГРАТЬ — by charodeychikmsm</title>
 <style>
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html{height:100%;}
@@ -132,7 +132,6 @@
   }
   .modal > button:active{transform:translateY(3px);box-shadow:0 1px 0 #1e3a9e;}
 
-  /* Авторизация */
   .auth-box{
     width:min(90vw,340px);padding:26px 22px;border-radius:22px;
     background:linear-gradient(180deg,#232f63,#151c3d);
@@ -141,13 +140,6 @@
   }
   .auth-box h2{margin:0 0 4px;font-size:24px;}
   .auth-box .sub{color:#8ea0cc;font-size:12px;margin-bottom:16px;}
-  .tabs{display:flex;gap:6px;margin-bottom:14px;background:rgba(0,0,0,.25);padding:4px;border-radius:12px;}
-  .tabs .tab{
-    flex:1;padding:9px 0;border:none;border-radius:9px;cursor:pointer;
-    background:transparent;color:#a9b7dd;font:700 13px/1 inherit;
-    transition:background .15s,color .15s;
-  }
-  .tabs .tab.active{background:linear-gradient(180deg,#5b86ff,#3358dc);color:#fff;}
   #authForm{display:flex;flex-direction:column;gap:10px;}
   #authForm input{
     padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);
@@ -164,7 +156,6 @@
   #authSubmit:active{transform:translateY(3px);box-shadow:0 1px 0 #1e3a9e;}
   .auth-error{color:#ff8f8f;font-size:13px;min-height:18px;margin-top:4px;}
 
-  /* Таблица рекордов */
   .lb-list{
     margin-top:8px;overflow-y:auto;max-height:52vh;text-align:left;
     display:flex;flex-direction:column;gap:6px;padding-right:4px;
@@ -179,10 +170,7 @@
   .lb-row .nick{flex:1;margin:0 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .lb-row .score{font-weight:800;color:#7dffb0;}
 
-  /* Отзывы */
-  .fb-form{
-    display:flex;flex-direction:column;gap:8px;margin-bottom:12px;
-  }
+  .fb-form{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
   .fb-form textarea{
     width:100%;min-height:70px;resize:vertical;
     padding:10px 12px;border-radius:12px;
@@ -221,12 +209,6 @@
   .fb-meta{font-size:11px;color:#8ea0cc;margin-bottom:4px;display:flex;justify-content:space-between;gap:6px;}
   .fb-meta b{color:#c9d6ff;}
   .fb-text{font-size:14px;line-height:1.35;word-wrap:break-word;overflow-wrap:break-word;}
-
-  #error-box{
-    display:none;position:fixed;inset:0;z-index:9999;
-    background:rgba(10,5,20,.96);color:#ffd0d0;
-    padding:24px;font:14px/1.5 monospace;overflow:auto;
-  }
 </style>
 </head>
 <body>
@@ -236,8 +218,8 @@
   <div class="user-bar">
     <span>👤 <b id="userNick">—</b></span>
     <div class="bar-right">
-      <button id="feedbackBtn" class="help" title="жалобы,отзывы,все принимаю,но не обещаю что будет выполнено">?</button>
-      <button id="logoutBtn" class="danger">Выйти</button>
+      <button id="feedbackBtn" class="help" title="жалоба,отзывы,все принимаю,но не обещаю что будет выполнено">?</button>
+      <button id="logoutBtn" class="danger">кыш</button>
     </div>
   </div>
 
@@ -245,66 +227,63 @@
 
   <div class="top">
     <div class="stat">
-      <div class="label">Очки</div>
+      <div class="label">балли</div>
       <div class="value" id="score">0</div>
     </div>
     <div class="stat">
-      <div class="label">Рекорд</div>
+      <div class="label">рекордик</div>
       <div class="value" id="bestVal">0</div>
       <button class="gear" id="gearBtn" title="Таблица рекордов">⚙</button>
     </div>
-    <button id="restart">Заново</button>
+    <button id="restart">сновааа</button>
   </div>
 
   <div class="board" id="board"></div>
   <div class="tray" id="tray"></div>
 </div>
 
-<!-- Игра окончена -->
 <div class="overlay hidden" id="overlay">
   <div class="modal">
-    <h2>Игра окончена</h2>
-    <p>Больше некуда поставить фигуры</p>
+    <h2>ти умер лох</h2>
+    <p>места нету!!!</p>
     <div class="big" id="finalScore">0</div>
-    <p>Ваш результат</p>
+    <p>твои балли</p>
     <button id="playAgain">Играть снова</button>
   </div>
 </div>
 
-<!-- Таблица рекордов -->
 <div class="overlay hidden" id="lbOverlay">
   <div class="modal">
-    <h2>🏆 Таблица рекордов</h2>
+    <h2>РЕКОРДЫ МИРА!!!</h2>
     <div class="lb-list" id="lbList">Загрузка...</div>
     <button id="lbClose">Закрыть</button>
   </div>
 </div>
 
-<!-- Отзывы -->
 <div class="overlay hidden" id="fbOverlay">
   <div class="modal">
-    <h2>💡 Отзывы и предложения</h2>
-    <p style="margin-bottom:10px;">Идеи, что добавить. Голосуйте за лучшие!<br>
-      <span style="font-size:12px;color:#8ea0cc;">Отзывы живут 3 дня, постить — раз в сутки.</span>
+    <h2>предлагай и проверяй,пам пам
+    </h2>
+    <p style="margin-bottom:10px;">идеи для обновлений<br>
+      <span style="font-size:12px;color:#8ea0cc;">Отзывы живут 3 дня, пости - тока раз в сутки.</span>
     </p>
     <div class="fb-form">
       <textarea id="fbText" maxlength="500" placeholder="Напишите идею, предложение или проблему..."></textarea>
-      <button id="fbSubmit">Отправить</button>
+      <button id="fbSubmit">закинуть</button>
       <div class="fb-hint" id="fbHint"></div>
     </div>
-    <div class="fb-list" id="fbList">Загрузка...</div>
-    <button id="fbClose">Закрыть</button>
+    <div class="fb-list" id="fbList">загружаю...</div>
+    <button id="fbClose">закрыть двери в географию</button>
   </div>
 </div>
 
-<!-- Авторизация -->
 <div class="overlay" id="authOverlay">
   <div class="auth-box">
     <h2>Block Blast</h2>
     <div class="sub">by charodeychikmsm</div>
     <form id="authForm">
       <input id="authNick" placeholder="Введите ник" maxlength="20" autocomplete="username">
-      <button type="submit" id="authSubmit">Играть</button>
+      <button type="submit" id="authSubmit">урок географии</button>
       <div class="auth-error" id="authError"></div>
     </form>
     <div style="font-size:11px;color:#8ea0cc;margin-top:10px;line-height:1.4;">
@@ -314,14 +293,12 @@
   </div>
 </div>
 
-<div id="error-box"></div>
-
 <script>
 (function(){
   'use strict';
 
-  // ============== ЗВУКИ (Web Audio API) ==============
-  let audioCtx = null;
+  // ============== ЗВУКИ ==============
+  var audioCtx = null;
   function getAudio() {
     if (!audioCtx) {
       try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
@@ -330,13 +307,12 @@
     if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
     return audioCtx;
   }
-
   function tone(freq, dur, vol, type, delay) {
-    const ctx = getAudio();
+    var ctx = getAudio();
     if (!ctx) return;
-    const t = ctx.currentTime + (delay || 0);
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
+    var t = ctx.currentTime + (delay || 0);
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
     osc.type = type || 'sine';
     osc.frequency.setValueAtTime(freq, t);
     gain.gain.setValueAtTime(0, t);
@@ -347,13 +323,10 @@
     osc.start(t);
     osc.stop(t + dur + 0.05);
   }
-
-  // Тихий мягкий звук установки блока
   function soundPlace() {
     tone(392, 0.10, 0.045, 'sine', 0);
     tone(587, 0.08, 0.025, 'sine', 0.02);
   }
-  // Спокойный аккорд при очистке линий
   function soundClear() {
     tone(523.25, 0.45, 0.06, 'sine', 0);
     tone(659.25, 0.42, 0.05, 'sine', 0.04);
@@ -361,117 +334,104 @@
     tone(1046.5, 0.45, 0.03, 'sine', 0.14);
   }
 
-  // ============== АВТОРИЗАЦИЯ ==============
-  const authOverlay = document.getElementById('authOverlay');
-  const authForm    = document.getElementById('authForm');
-  const authNick    = document.getElementById('authNick');
-  const authPass    = document.getElementById('authPass');
-  const authError   = document.getElementById('authError');
-  const authSubmit  = document.getElementById('authSubmit');
-  const userNickEl  = document.getElementById('userNick');
-  const logoutBtn   = document.getElementById('logoutBtn');
-  const gearBtn     = document.getElementById('gearBtn');
-  const lbOverlay   = document.getElementById('lbOverlay');
-  const lbList      = document.getElementById('lbList');
-  const lbClose     = document.getElementById('lbClose');
-  const feedbackBtn = document.getElementById('feedbackBtn');
-  const fbOverlay   = document.getElementById('fbOverlay');
-  const fbList      = document.getElementById('fbList');
-  const fbText      = document.getElementById('fbText');
-  const fbSubmit    = document.getElementById('fbSubmit');
-  const fbHint      = document.getElementById('fbHint');
-  const fbClose     = document.getElementById('fbClose');
+  // ============== DOM ==============
+  var authOverlay = document.getElementById('authOverlay');
+  var authForm    = document.getElementById('authForm');
+  var authNick    = document.getElementById('authNick');
+  var authError   = document.getElementById('authError');
+  var authSubmit  = document.getElementById('authSubmit');
+  var userNickEl  = document.getElementById('userNick');
+  var logoutBtn   = document.getElementById('logoutBtn');
+  var gearBtn     = document.getElementById('gearBtn');
+  var lbOverlay   = document.getElementById('lbOverlay');
+  var lbList      = document.getElementById('lbList');
+  var lbClose     = document.getElementById('lbClose');
+  var feedbackBtn = document.getElementById('feedbackBtn');
+  var fbOverlay   = document.getElementById('fbOverlay');
+  var fbList      = document.getElementById('fbList');
+  var fbText      = document.getElementById('fbText');
+  var fbSubmit    = document.getElementById('fbSubmit');
+  var fbHint      = document.getElementById('fbHint');
+  var fbClose     = document.getElementById('fbClose');
 
-  let authMode = 'login';
-  let currentUser = null;
-
-  document.querySelectorAll('.tabs .tab').forEach(t => {
-    t.addEventListener('click', () => {
-      document.querySelectorAll('.tabs .tab').forEach(x => x.classList.remove('active'));
-      t.classList.add('active');
-      authMode = t.dataset.tab;
-      authSubmit.textContent = authMode === 'login' ? 'Войти' : 'Зарегистрироваться';
-      authError.textContent = '';
-      authPass.setAttribute('autocomplete', authMode === 'login' ? 'current-password' : 'new-password');
-    });
-  });
+  var currentUser = null;
 
   async function api(path, opts) {
     opts = opts || {};
     opts.headers = Object.assign({ 'Content-Type': 'application/json' }, opts.headers || {});
-    const r = await fetch(path, opts);
-    let data = null;
+    var r = await fetch(path, opts);
+    var data = null;
     try { data = await r.json(); } catch(e){}
     return { ok: r.ok, status: r.status, data: data || {} };
   }
 
-  authForm.addEventListener('submit', async (e) => {
+  authForm.addEventListener('submit', async function(e){
     e.preventDefault();
     authError.textContent = '';
-    const nick = authNick.value.trim();
-    const pass = authPass.value;
-    if (!nick || !pass) { authError.textContent = 'Заполните все поля'; return; }
+    var nick = authNick.value.trim();
+    if (!nick) { authError.textContent = 'Введите ник'; return; }
     authSubmit.disabled = true;
     authSubmit.textContent = '...';
-    const path = authMode === 'login' ? '/api/login' : '/api/register';
-    const res = await api(path, { method: 'POST', body: JSON.stringify({ nick, password: pass }) });
+
+    var res = await api('/api/login', {
+      method: 'POST',
+      body: JSON.stringify({ nick: nick })
+    });
+
     authSubmit.disabled = false;
-    authSubmit.textContent = authMode === 'login' ? 'Войти' : 'Зарегистрироваться';
+    authSubmit.textContent = 'Играть';
+
     if (!res.ok) { authError.textContent = res.data.error || 'Ошибка'; return; }
+
     currentUser = { nick: res.data.nick, best: res.data.best || 0, token: res.data.token };
     try { localStorage.setItem('bb_token', currentUser.token); } catch(e){}
-    getAudio(); // разблокируем аудио после жеста
+    getAudio();
     enterGame();
   });
 
-  logoutBtn.addEventListener('click', () => {
+  logoutBtn.addEventListener('click', function(){
     currentUser = null;
     try { localStorage.removeItem('bb_token'); } catch(e){}
     authOverlay.classList.remove('hidden');
-    authOverlay.style.opacity = '1';
-    authOverlay.style.pointerEvents = 'auto';
     userNickEl.textContent = '—';
-    authPass.value = '';
   });
 
   function enterGame() {
     userNickEl.textContent = currentUser.nick;
     bestEl.textContent = currentUser.best || 0;
     authOverlay.classList.add('hidden');
-    authOverlay.style.opacity = '0';
-    authOverlay.style.pointerEvents = 'none';
     startGame();
   }
 
   async function tryAutoLogin() {
-    let token = null;
+    var token = null;
     try { token = localStorage.getItem('bb_token'); } catch(e){}
     if (!token) return false;
-    const res = await api('/api/me', { headers: { 'x-token': token } });
+    var res = await api('/api/me', { headers: { 'x-token': token } });
     if (!res.ok) { try { localStorage.removeItem('bb_token'); } catch(e){} return false; }
-    currentUser = { nick: res.data.nick, best: res.data.best || 0, token };
+    currentUser = { nick: res.data.nick, best: res.data.best || 0, token: token };
     return true;
   }
 
-  // ============== ТАБЛИЦА РЕКОРДОВ ==============
-  gearBtn.addEventListener('click', async () => {
+  // ============== ЛИДЕРБОРД ==============
+  gearBtn.addEventListener('click', async function(){
     lbOverlay.classList.remove('hidden');
     lbList.innerHTML = 'Загрузка...';
-    const res = await api('/api/leaderboard');
+    var res = await api('/api/leaderboard');
     if (!res.ok || !res.data.leaderboard) {
       lbList.innerHTML = '<div style="padding:12px;color:#ff8f8f;">Не удалось загрузить</div>';
       return;
     }
-    const list = res.data.leaderboard;
+    var list = res.data.leaderboard;
     if (list.length === 0) {
       lbList.innerHTML = '<div style="padding:12px;color:#8ea0cc;">Пока пусто</div>';
       return;
     }
     lbList.innerHTML = '';
-    list.forEach((u, i) => {
-      const row = document.createElement('div');
+    list.forEach(function(u, i){
+      var row = document.createElement('div');
       row.className = 'lb-row' + (currentUser && u.nick.toLowerCase() === currentUser.nick.toLowerCase() ? ' me' : '');
-      let medal = '';
+      var medal = '';
       if (i === 0) medal = '🥇'; else if (i === 1) medal = '🥈'; else if (i === 2) medal = '🥉';
       row.innerHTML =
         '<span class="place">' + (medal || ('#' + (i + 1))) + '</span>' +
@@ -480,13 +440,13 @@
       lbList.appendChild(row);
     });
   });
-  lbClose.addEventListener('click', () => lbOverlay.classList.add('hidden'));
-  lbOverlay.addEventListener('click', e => { if (e.target === lbOverlay) lbOverlay.classList.add('hidden'); });
+  lbClose.addEventListener('click', function(){ lbOverlay.classList.add('hidden'); });
+  lbOverlay.addEventListener('click', function(e){ if (e.target === lbOverlay) lbOverlay.classList.add('hidden'); });
 
   // ============== ОТЗЫВЫ ==============
   feedbackBtn.addEventListener('click', openFeedback);
-  fbClose.addEventListener('click', () => fbOverlay.classList.add('hidden'));
-  fbOverlay.addEventListener('click', e => { if (e.target === fbOverlay) fbOverlay.classList.add('hidden'); });
+  fbClose.addEventListener('click', function(){ fbOverlay.classList.add('hidden'); });
+  fbOverlay.addEventListener('click', function(e){ if (e.target === fbOverlay) fbOverlay.classList.add('hidden'); });
 
   async function openFeedback() {
     fbOverlay.classList.remove('hidden');
@@ -497,16 +457,16 @@
   }
 
   async function loadFeedback() {
-    const res = await api('/api/feedback', { headers: { 'x-token': currentUser.token } });
+    var res = await api('/api/feedback', { headers: { 'x-token': currentUser.token } });
     if (!res.ok) {
       fbList.innerHTML = '<div style="padding:12px;color:#ff8f8f;">' + (res.data.error || 'Ошибка') + '</div>';
       return;
     }
-    const { feedback, canPostIn } = res.data;
+    var feedback = res.data.feedback || [];
+    var canPostIn = res.data.canPostIn || 0;
 
-    // Обновляем поле ввода
     if (canPostIn > 0) {
-      const h = Math.ceil(canPostIn / 3600000);
+      var h = Math.ceil(canPostIn / 3600000);
       fbSubmit.disabled = true;
       fbText.disabled = true;
       fbText.placeholder = 'Вы уже писали. Следующий отзыв через ' + h + ' ч.';
@@ -518,25 +478,24 @@
       fbHint.textContent = '';
     }
 
-    // Список
-    if (!feedback || feedback.length === 0) {
+    if (!feedback.length) {
       fbList.innerHTML = '<div style="padding:12px;color:#8ea0cc;">Пока отзывов нет — будьте первым!</div>';
       return;
     }
 
     fbList.innerHTML = '';
-    feedback.forEach(f => {
-      const item = document.createElement('div');
+    feedback.forEach(function(f){
+      var item = document.createElement('div');
       item.className = 'fb-item' + (f.mine ? ' mine' : '');
 
-      const likeBtn = document.createElement('button');
+      var likeBtn = document.createElement('button');
       likeBtn.className = 'fb-like' + (f.liked ? ' liked' : '');
       likeBtn.type = 'button';
       likeBtn.innerHTML = '<span class="arr">▲</span><span>' + f.likes + '</span>';
       likeBtn.title = f.liked ? 'Убрать голос' : 'Голосовать';
-      likeBtn.addEventListener('click', async () => {
+      likeBtn.addEventListener('click', async function(){
         likeBtn.disabled = true;
-        const r = await api('/api/feedback/' + f.id + '/like', {
+        var r = await api('/api/feedback/' + f.id + '/like', {
           method: 'POST',
           headers: { 'x-token': currentUser.token }
         });
@@ -549,11 +508,10 @@
         }
       });
 
-      const body = document.createElement('div');
+      var body = document.createElement('div');
       body.className = 'fb-body';
-      const ago = timeAgo(f.createdAt);
       body.innerHTML =
-        '<div class="fb-meta"><b>' + escapeHtml(f.nick) + '</b><span>' + ago + '</span></div>' +
+        '<div class="fb-meta"><b>' + escapeHtml(f.nick) + '</b><span>' + timeAgo(f.createdAt) + '</span></div>' +
         '<div class="fb-text">' + escapeHtml(f.text) + '</div>';
 
       item.appendChild(likeBtn);
@@ -562,15 +520,15 @@
     });
   }
 
-  fbSubmit.addEventListener('click', async () => {
-    const text = fbText.value.trim();
+  fbSubmit.addEventListener('click', async function(){
+    var text = fbText.value.trim();
     if (text.length < 3) { fbHint.textContent = 'Минимум 3 символа'; return; }
     fbSubmit.disabled = true;
     fbHint.textContent = 'Отправка...';
-    const res = await api('/api/feedback', {
+    var res = await api('/api/feedback', {
       method: 'POST',
       headers: { 'x-token': currentUser.token },
-      body: JSON.stringify({ text })
+      body: JSON.stringify({ text: text })
     });
     if (!res.ok) {
       fbHint.textContent = res.data.error || 'Ошибка';
@@ -582,27 +540,28 @@
   });
 
   function timeAgo(ts) {
-    const diff = Date.now() - ts;
-    const m = Math.floor(diff / 60000);
+    var diff = Date.now() - ts;
+    var m = Math.floor(diff / 60000);
     if (m < 1) return 'только что';
     if (m < 60) return m + ' мин назад';
-    const h = Math.floor(m / 60);
+    var h = Math.floor(m / 60);
     if (h < 24) return h + ' ч назад';
-    const d = Math.floor(h / 24);
-    return d + ' д назад';
+    return Math.floor(h / 24) + ' д назад';
   }
 
   function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, ch => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[ch]));
+    return String(s).replace(/[&<>"']/g, function(ch){
+      return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[ch];
+    });
   }
 
-  // ============== ОТПРАВКА СЧЁТА ==============
-  let scoreSendTimer = null;
+  // ============== СЧЁТ ==============
+  var scoreSendTimer = null;
   function scheduleSubmitScore(s) {
     if (!currentUser) return;
     if (scoreSendTimer) clearTimeout(scoreSendTimer);
-    scoreSendTimer = setTimeout(async () => {
-      const res = await api('/api/score', {
+    scoreSendTimer = setTimeout(async function(){
+      var res = await api('/api/score', {
         method: 'POST',
         headers: { 'x-token': currentUser.token },
         body: JSON.stringify({ score: s })
@@ -615,9 +574,9 @@
   }
 
   // ============== ИГРА ==============
-  const SIZE = 8, GAP = 4, PLACE_POINTS = 5;
-  const COLORS = ['#ff4d6d','#ff9f1c','#ffd60a','#4ade80','#22d3ee','#3b82f6','#a855f7','#f472b6'];
-  const SHAPES = [
+  var SIZE = 8, GAP = 4, PLACE_POINTS = 5;
+  var COLORS = ['#ff4d6d','#ff9f1c','#ffd60a','#4ade80','#22d3ee','#3b82f6','#a855f7','#f472b6'];
+  var SHAPES = [
     {g:["X"],w:2},{g:["XX"],w:4},{g:["X","X"],w:4},{g:["XXX"],w:3},{g:["X","X","X"],w:3},
     {g:["XX","XX"],w:3},{g:["XX","X."],w:2},{g:["XX",".X"],w:2},{g:["X.","XX"],w:2},{g:[".X","XX"],w:2},
     {g:["XXXX"],w:1},{g:["X","X","X","X"],w:1},{g:["XXX","XXX"],w:1},{g:["XX","XX","XX"],w:1},
@@ -626,24 +585,24 @@
     {g:["X.","XX","X."],w:1},{g:[".X","XX",".X"],w:1},{g:[".XX","XX."],w:1},{g:["XX.",".XX"],w:1},
     {g:["X.","XX",".X"],w:1},{g:[".X","XX","X."],w:1}
   ];
-  const POOL = [];
-  SHAPES.forEach(s => { for (let i = 0; i < s.w; i++) POOL.push(s.g); });
+  var POOL = [];
+  SHAPES.forEach(function(s){ for (var i = 0; i < s.w; i++) POOL.push(s.g); });
 
-  const boardEl = document.getElementById('board');
-  const trayEl  = document.getElementById('tray');
-  const scoreEl = document.getElementById('score');
-  const bestEl  = document.getElementById('bestVal');
-  const overlay = document.getElementById('overlay');
-  const finalEl = document.getElementById('finalScore');
+  var boardEl = document.getElementById('board');
+  var trayEl  = document.getElementById('tray');
+  var scoreEl = document.getElementById('score');
+  var bestEl  = document.getElementById('bestVal');
+  var overlay = document.getElementById('overlay');
+  var finalEl = document.getElementById('finalScore');
 
-  let grid, tray, score = 0;
-  let gameOver = false, busy = false, drag = null;
-  let cellEls = [], slotEls = [], previewCells = [];
+  var grid, tray, score = 0;
+  var gameOver = false, busy = false, drag = null;
+  var cellEls = [], slotEls = [], previewCells = [];
 
-  for (let r = 0; r < SIZE; r++) {
+  for (var r = 0; r < SIZE; r++) {
     cellEls[r] = [];
-    for (let c = 0; c < SIZE; c++) {
-      const d = document.createElement('div');
+    for (var c = 0; c < SIZE; c++) {
+      var d = document.createElement('div');
       d.className = 'cell';
       boardEl.appendChild(d);
       cellEls[r][c] = d;
@@ -651,48 +610,49 @@
   }
 
   function rgba(hex, a) {
-    const n = parseInt(hex.slice(1), 16);
+    var n = parseInt(hex.slice(1), 16);
     return 'rgba(' + ((n>>16)&255) + ',' + ((n>>8)&255) + ',' + (n&255) + ',' + a + ')';
   }
   function boardMetrics() {
-    const a = cellEls[0][0].getBoundingClientRect();
-    const b = cellEls[0][1].getBoundingClientRect();
-    const cs = a.width || 30;
-    const step = (b.left - a.left) || (cs + GAP);
-    return { cs, step, x: a.left, y: a.top };
+    var a = cellEls[0][0].getBoundingClientRect();
+    var b = cellEls[0][1].getBoundingClientRect();
+    var cs = a.width || 30;
+    var step = (b.left - a.left) || (cs + GAP);
+    return { cs: cs, step: step, x: a.left, y: a.top };
   }
   function trayCellSize() { return Math.max(11, Math.round(boardMetrics().cs * 0.52)); }
   function makePiece() {
-    const g = POOL[Math.floor(Math.random() * POOL.length)];
-    const h = g.length, w = g[0].length;
-    const cells = [];
-    for (let r = 0; r < h; r++)
-      for (let c = 0; c < w; c++)
+    var g = POOL[Math.floor(Math.random() * POOL.length)];
+    var h = g.length, w = g[0].length;
+    var cells = [];
+    for (var r = 0; r < h; r++)
+      for (var c = 0; c < w; c++)
         if (g[r][c] === 'X') cells.push([r, c]);
-    return { h, w, cells, color: COLORS[Math.floor(Math.random()*COLORS.length)], used: false };
+    return { h: h, w: w, cells: cells, color: COLORS[Math.floor(Math.random()*COLORS.length)], used: false };
   }
   function pieceEl(p, cs, gap) {
-    const el = document.createElement('div');
+    var el = document.createElement('div');
     el.style.display = 'grid';
     el.style.gridTemplateColumns = 'repeat(' + p.w + ',' + cs + 'px)';
     el.style.gridTemplateRows    = 'repeat(' + p.h + ',' + cs + 'px)';
     el.style.gap = gap + 'px';
-    for (const [r, c] of p.cells) {
-      const d = document.createElement('div');
+    for (var i = 0; i < p.cells.length; i++) {
+      var rc = p.cells[i];
+      var d = document.createElement('div');
       d.className = 'blk';
       d.style.width = cs + 'px';
       d.style.height = cs + 'px';
-      d.style.gridRow = (r + 1);
-      d.style.gridColumn = (c + 1);
+      d.style.gridRow = (rc[0] + 1);
+      d.style.gridColumn = (rc[1] + 1);
       d.style.background = p.color;
       el.appendChild(d);
     }
     return el;
   }
   function renderBoard() {
-    for (let r = 0; r < SIZE; r++)
-      for (let c = 0; c < SIZE; c++) {
-        const el = cellEls[r][c], v = grid[r][c];
+    for (var r = 0; r < SIZE; r++)
+      for (var c = 0; c < SIZE; c++) {
+        var el = cellEls[r][c], v = grid[r][c];
         if (v) { el.style.background = v; el.classList.add('filled'); }
         else   { el.style.background = ''; el.classList.remove('filled'); }
       }
@@ -700,15 +660,15 @@
   function renderTray() {
     trayEl.innerHTML = '';
     slotEls = [];
-    const cs = trayCellSize();
-    for (let i = 0; i < 3; i++) {
-      const slot = document.createElement('div');
+    var cs = trayCellSize();
+    for (var i = 0; i < 3; i++) {
+      var slot = document.createElement('div');
       slot.className = 'slot';
-      const p = tray[i];
+      var p = tray[i];
       if (p && !p.used) {
-        const el = pieceEl(p, cs, GAP);
+        var el = pieceEl(p, cs, GAP);
         el.classList.add('piece');
-        (function(idx){ el.addEventListener('pointerdown', e => onPointerDown(e, idx)); })(i);
+        (function(idx){ el.addEventListener('pointerdown', function(e){ onPointerDown(e, idx); }); })(i);
         slot.appendChild(el);
       }
       trayEl.appendChild(slot);
@@ -718,37 +678,38 @@
   function addScore(n) {
     score += n;
     scoreEl.textContent = score;
-    const pop = document.createElement('div');
+    var pop = document.createElement('div');
     pop.className = 'pop';
     pop.textContent = '+' + n;
     scoreEl.parentElement.appendChild(pop);
-    setTimeout(() => pop.remove(), 860);
+    setTimeout(function(){ pop.remove(); }, 860);
     if (currentUser && score > (currentUser.best || 0)) {
       currentUser.best = score;
-      bestEl.textContent = score;  // <-- ИСПРАВЛЕНО (было best)
+      bestEl.textContent = score;
       scheduleSubmitScore(score);
     }
   }
   function clearPreview() {
-    for (const [r, c] of previewCells) {
-      const el = cellEls[r][c];
+    for (var i = 0; i < previewCells.length; i++) {
+      var rc = previewCells[i];
+      var el = cellEls[rc[0]][rc[1]];
       el.classList.remove('preview');
-      if (!grid[r][c]) el.style.background = '';
+      if (!grid[rc[0]][rc[1]]) el.style.background = '';
     }
     previewCells = [];
   }
   function onPointerDown(e, index) {
-    getAudio(); // разблокировка звука по жесту
+    getAudio();
     if (gameOver || busy || drag) return;
-    const piece = tray[index];
+    var piece = tray[index];
     if (!piece || piece.used) return;
     e.preventDefault();
-    const m = boardMetrics();
-    const ghost = pieceEl(piece, m.cs, GAP);
+    var m = boardMetrics();
+    var ghost = pieceEl(piece, m.cs, GAP);
     ghost.classList.add('ghost');
     document.body.appendChild(ghost);
     drag = {
-      index, piece, ghost, pid: e.pointerId,
+      index: index, piece: piece, ghost: ghost, pid: e.pointerId,
       touch: e.pointerType === 'touch',
       w: piece.w * (m.cs + GAP) - GAP,
       h: piece.h * (m.cs + GAP) - GAP,
@@ -761,7 +722,7 @@
     window.addEventListener('pointercancel', onPointerUp);
   }
   function moveGhost(x, y) {
-    const lift = drag.touch ? 60 : 0;
+    var lift = drag.touch ? 60 : 0;
     drag.gx = x - drag.w / 2;
     drag.gy = y - drag.h / 2 - lift;
     drag.ghost.style.left = drag.gx + 'px';
@@ -772,21 +733,23 @@
     clearPreview();
     if (!drag) return;
     drag.target = null;
-    const m = boardMetrics();
-    const col = Math.round((drag.gx - m.x) / m.step);
-    const row = Math.round((drag.gy - m.y) / m.step);
-    const cells = [];
-    for (const [dr, dc] of drag.piece.cells) {
-      const r = row + dr, c = col + dc;
+    var m = boardMetrics();
+    var col = Math.round((drag.gx - m.x) / m.step);
+    var row = Math.round((drag.gy - m.y) / m.step);
+    var cells = [];
+    for (var i = 0; i < drag.piece.cells.length; i++) {
+      var d = drag.piece.cells[i];
+      var r = row + d[0], c = col + d[1];
       if (r < 0 || r >= SIZE || c < 0 || c >= SIZE || grid[r][c]) return;
       cells.push([r, c]);
     }
-    drag.target = { row, col };
-    for (const [r, c] of cells) {
-      const el = cellEls[r][c];
+    drag.target = { row: row, col: col };
+    for (var j = 0; j < cells.length; j++) {
+      var rc = cells[j];
+      var el = cellEls[rc[0]][rc[1]];
       el.style.background = rgba(drag.piece.color, 0.5);
       el.classList.add('preview');
-      previewCells.push([r, c]);
+      previewCells.push(rc);
     }
   }
   function onPointerMove(e) {
@@ -799,7 +762,7 @@
     window.removeEventListener('pointermove', onPointerMove);
     window.removeEventListener('pointerup', onPointerUp);
     window.removeEventListener('pointercancel', onPointerUp);
-    const d = drag; drag = null;
+    var d = drag; drag = null;
     d.ghost.remove();
     clearPreview();
     if (slotEls[d.index]) slotEls[d.index].style.opacity = '';
@@ -807,47 +770,58 @@
   }
   function placePiece(index, piece, row, col) {
     busy = true;
-    for (const [dr, dc] of piece.cells) grid[row + dr][col + dc] = piece.color;
+    for (var i = 0; i < piece.cells.length; i++) {
+      var rc = piece.cells[i];
+      grid[row + rc[0]][col + rc[1]] = piece.color;
+    }
     piece.used = true;
     addScore(PLACE_POINTS);
-    soundPlace(); // <-- звук установки
+    soundPlace();
     renderBoard();
     renderTray();
     resolveLines();
   }
   function resolveLines() {
-    const rows = [], cols = [];
-    for (let r = 0; r < SIZE; r++) {
-      let full = true;
-      for (let c = 0; c < SIZE; c++) if (!grid[r][c]) { full = false; break; }
+    var rows = [], cols = [];
+    for (var r = 0; r < SIZE; r++) {
+      var full = true;
+      for (var c = 0; c < SIZE; c++) if (!grid[r][c]) { full = false; break; }
       if (full) rows.push(r);
     }
-    for (let c = 0; c < SIZE; c++) {
-      let full = true;
-      for (let r = 0; r < SIZE; r++) if (!grid[r][c]) { full = false; break; }
-      if (full) cols.push(c);
+    for (var c2 = 0; c2 < SIZE; c2++) {
+      var full2 = true;
+      for (var r2 = 0; r2 < SIZE; r2++) if (!grid[r2][c2]) { full2 = false; break; }
+      if (full2) cols.push(c2);
     }
-    const total = rows.length + cols.length;
+    var total = rows.length + cols.length;
     if (!total) { finishTurn(); return; }
     addScore(total * 10 + Math.max(0, total - 1) * 15);
-    soundClear(); // <-- звук очистки линий
-    const toClear = new Set();
-    rows.forEach(r => { for (let c = 0; c < SIZE; c++) toClear.add(r * SIZE + c); });
-    cols.forEach(c => { for (let r = 0; r < SIZE; r++) toClear.add(r * SIZE + c); });
-    toClear.forEach(k => cellEls[Math.floor(k/SIZE)][k % SIZE].classList.add('clear'));
-    setTimeout(() => {
-      toClear.forEach(k => {
-        const r = Math.floor(k/SIZE), c = k % SIZE;
-        grid[r][c] = null;
-        cellEls[r][c].classList.remove('clear');
-      });
+    soundClear();
+    var toClear = {};
+    for (var i = 0; i < rows.length; i++)
+      for (var c3 = 0; c3 < SIZE; c3++) toClear[rows[i]*SIZE + c3] = true;
+    for (var j = 0; j < cols.length; j++)
+      for (var r3 = 0; r3 < SIZE; r3++) toClear[r3*SIZE + cols[j]] = true;
+    for (var k in toClear) {
+      var kk = parseInt(k, 10);
+      cellEls[Math.floor(kk/SIZE)][kk % SIZE].classList.add('clear');
+    }
+    setTimeout(function(){
+      for (var k2 in toClear) {
+        var kk2 = parseInt(k2, 10);
+        var rr = Math.floor(kk2/SIZE), cc = kk2 % SIZE;
+        grid[rr][cc] = null;
+        cellEls[rr][cc].classList.remove('clear');
+      }
       renderBoard();
       finishTurn();
     }, 250);
   }
   function finishTurn() {
     busy = false;
-    if (tray.every(p => p.used)) {
+    var allUsed = true;
+    for (var i = 0; i < tray.length; i++) if (!tray[i].used) { allUsed = false; break; }
+    if (allUsed) {
       tray = [makePiece(), makePiece(), makePiece()];
       renderTray();
     }
@@ -855,11 +829,12 @@
   }
   function canPlaceAnywhere(p) {
     if (!p) return false;
-    for (let r = 0; r + p.h <= SIZE; r++)
-      for (let c = 0; c + p.w <= SIZE; c++) {
-        let ok = true;
-        for (const [dr, dc] of p.cells) {
-          if (grid[r + dr][c + dc]) { ok = false; break; }
+    for (var r = 0; r + p.h <= SIZE; r++)
+      for (var c = 0; c + p.w <= SIZE; c++) {
+        var ok = true;
+        for (var i = 0; i < p.cells.length; i++) {
+          var rc = p.cells[i];
+          if (grid[r + rc[0]][c + rc[1]]) { ok = false; break; }
         }
         if (ok) return true;
       }
@@ -867,7 +842,10 @@
   }
   function checkGameOver() {
     if (gameOver) return;
-    if (!tray.some(p => !p.used && canPlaceAnywhere(p))) {
+    var any = false;
+    for (var i = 0; i < tray.length; i++)
+      if (!tray[i].used && canPlaceAnywhere(tray[i])) { any = true; break; }
+    if (!any) {
       gameOver = true;
       finalEl.textContent = score;
       overlay.classList.remove('hidden');
@@ -876,7 +854,11 @@
   }
   function startGame() {
     grid = [];
-    for (let r = 0; r < SIZE; r++) grid.push(new Array(SIZE).fill(null));
+    for (var r = 0; r < SIZE; r++) {
+      var row = [];
+      for (var c = 0; c < SIZE; c++) row.push(null);
+      grid.push(row);
+    }
     score = 0;
     gameOver = false;
     busy = false;
@@ -891,15 +873,13 @@
 
   document.getElementById('restart').addEventListener('click', startGame);
   document.getElementById('playAgain').addEventListener('click', startGame);
-  document.addEventListener('contextmenu', e => e.preventDefault());
-  window.addEventListener('resize', () => { if (!drag && !gameOver) renderTray(); });
+  document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+  window.addEventListener('resize', function(){ if (!drag && !gameOver) renderTray(); });
 
-  // ============== СТАРТ ==============
-  (async function boot() {
-    const ok = await tryAutoLogin();
+  (async function boot(){
+    var ok = await tryAutoLogin();
     if (ok) enterGame();
   })();
-
 })();
 </script>
 </body>
