@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Block Blast — by charodeychikmsm</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html{height:100%;}
+  body{
+    min-height:100%;margin:0;padding:8px;
+    display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(120% 90% at 50% 0%, #26346e 0%, #0d1330 55%, #05070f 100%);
+    font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;
+    color:#eaf0ff;user-select:none;-webkit-user-select:none;
+    overflow-y:auto;overflow-x:hidden;
+  }
+  .game{width:min(94vw,420px);max-width:100%;display:flex;flex-direction:column;gap:12px;padding:12px;margin:auto;}
+
+  .user-bar{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    padding:6px 12px;border-radius:12px;
+    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);
+    font-size:13px;
+  }
+  .user-bar b{color:#7dffb0;}
+  .user-bar button{
+    border:none;background:rgba(255,90,90,.18);color:#ffb3b3;
+    padding:5px 10px;border-radius:8px;font:600 12px/1 inherit;cursor:pointer;
+  }
+  .user-bar button:hover{background:rgba(255,90,90,.3);}
+
+  .credits{
+    text-align:center;font-size:12px;font-weight:700;letter-spacing:.08em;
+    color:#8ea0cc;padding:0;text-shadow:0 0 12px rgba(91,134,255,.35);
+  }
+  .credits span{
+    background:linear-gradient(90deg,#5b86ff,#a855f7,#22d3ee);
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;color:transparent;
+  }
+
+  .top{display:flex;gap:10px;align-items:stretch;}
+  .stat{
+    flex:1;position:relative;
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.09);
+    border-radius:14px;padding:7px 12px;
+  }
+  .stat .label{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#8ea0cc;}
+  .stat .value{font-size:22px;font-weight:800;line-height:1.15;}
+  .stat .gear{
+    position:absolute;top:4px;right:4px;
+    width:28px;height:28px;border-radius:50%;
+    border:none;background:rgba(255,255,255,.1);color:#eaf0ff;
+    font-size:15px;cursor:pointer;line-height:1;
+    display:flex;align-items:center;justify-content:center;
+    transition:background .15s, transform .15s;
+  }
+  .stat .gear:hover{background:rgba(91,134,255,.45);transform:rotate(45deg);}
+
+  #restart{
+    border:none;border-radius:14px;padding:0 16px;cursor:pointer;
+    font:700 13px/1 inherit;color:#fff;
+    background:linear-gradient(180deg,#5b86ff,#3358dc);
+    box-shadow:0 4px 0 #1e3a9e, 0 8px 18px rgba(0,0,0,.35);
+    transition:transform .08s, box-shadow .08s;
+  }
+  #restart:active{transform:translateY(3px);box-shadow:0 1px 0 #1e3a9e;}
+
+  .board{
+    display:grid;grid-template-columns:repeat(8,1fr);gap:4px;
+    padding:6px;border-radius:18px;
+    background:rgba(0,0,0,.3);
+    box-shadow:inset 0 2px 12px rgba(0,0,0,.6), 0 10px 30px rgba(0,0,0,.45);
+    border:1px solid rgba(255,255,255,.06);
+    touch-action:none;
+  }
+  .cell{aspect-ratio:1/1;border-radius:7px;background:rgba(255,255,255,.065);transition:background .1s;min-height:12px;}
+  .cell.filled{box-shadow:inset 0 -3px 0 rgba(0,0,0,.3), inset 0 2px 0 rgba(255,255,255,.28);}
+  .cell.preview{box-shadow:inset 0 0 0 2px rgba(255,255,255,.55);}
+  .cell.clear{animation:pop .24s ease forwards;}
+  @keyframes pop{60%{transform:scale(1.15);}100%{transform:scale(.2);opacity:0;}}
+
+  .tray{
+    display:flex;justify-content:space-around;align-items:center;
+    gap:6px;padding:8px;min-height:112px;border-radius:18px;
+    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);
+    touch-action:none;
+  }
+  .slot{flex:1;display:flex;align-items:center;justify-content:center;height:100%;min-height:90px;}
+  .piece{cursor:grab;touch-action:none;}
+  .piece:active{cursor:grabbing;}
+  .blk{border-radius:7px;box-shadow:inset 0 -3px 0 rgba(0,0,0,.3), inset 0 2px 0 rgba(255,255,255,.28);}
+  .ghost{position:fixed;left:0;top:0;pointer-events:none;z-index:99;filter:drop-shadow(0 8px 14px rgba(0,0,0,.5));}
+  .pop{
+    position:absolute;right:10px;top:8px;font-weight:800;font-size:15px;color:#7dffb0;
+    animation:floatUp .85s ease-out forwards;pointer-events:none;
+  }
+  @keyframes floatUp{from{opacity:1;transform:translateY(0);}to{opacity:0;transform:translateY(-28px);}}
+
+  .overlay{
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+    background:rgba(4,7,18,.78);backdrop-filter:blur(6px);z-index:200;
+    transition:opacity .25s;padding:16px;
+  }
+  .overlay.hidden{opacity:0;pointer-events:none;}
+  .modal{
+    width:min(90vw,360px);text-align:center;padding:24px 22px;border-radius:22px;
+    background:linear-gradient(180deg,#232f63,#151c3d);
+    border:1px solid rgba(255,255,255,.12);
+    box-shadow:0 24px 60px rgba(0,0,0,.6);
+    max-height:88vh;display:flex;flex-direction:column;
+  }
+  .modal h2{margin:0 0 6px;font-size:22px;}
+  .modal p{margin:4px 0 12px;color:#a9b7dd;font-size:14px;}
+  .modal .big{font-size:40px;font-weight:900;color:#7dffb0;line-height:1;}
+  .modal button{
+    margin-top:14px;width:100%;border:none;border-radius:14px;padding:14px;cursor:pointer;
+    font:700 15px/1 inherit;color:#fff;
+    background:linear-gradient(180deg,#5b86ff,#3358dc);
+    box-shadow:0 4px 0 #1e3a9e;
+  }
+  .modal button:active{transform:translateY(3px);box-shadow:0 1px 0 #1e3a9e;}
+
+  /* ---------- Авторизация ---------- */
+  .auth-box{
+    width:min(90vw,340px);padding:26px 22px;border-radius:22px;
+    background:linear-gradient(180deg,#232f63,#151c3d);
+    border:1px solid rgba(255,255,255,.12);
+    box-shadow:0 24px 60px rgba(0,0,0,.6);text-align:center;
+  }
+  .auth-box h2{margin:0 0 4px;font-size:24px;}
+  .auth-box .sub{color:#8ea0cc;font-size:12px;margin-bottom:16px;}
+  .tabs{display:flex;gap:6px;margin-bottom:14px;background:rgba(0,0,0,.25);padding:4px;border-radius:12px;}
+  .tabs .tab{
+    flex:1;padding:9px 0;border:none;border-radius:9px;cursor:pointer;
+    background:transparent;color:#a9b7dd;font:700 13px/1 inherit;
+    transition:background .15s,color .15s;
+  }
+  .tabs .tab.active{background:linear-gradient(180deg,#5b86ff,#3358dc);color:#fff;}
+  #authForm{display:flex;flex-direction:column;gap:10px;}
+  #authForm input{
+    padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);
+    background:rgba(0,0,0,.28);color:#eaf0ff;font:500 15px/1 inherit;
+    outline:none;transition:border-color .15s;
+  }
+  #authForm input:focus{border-color:#5b86ff;}
+  #authSubmit{
+    padding:13px;border:none;border-radius:12px;cursor:pointer;
+    font:800 15px/1 inherit;color:#fff;
+    background:linear-gradient(180deg,#5b86ff,#3358dc);
+    box-shadow:0 4px 0 #1e3a9e;
+  }
+  #authSubmit:active{transform:translateY(3px);box-shadow:0 1px 0 #1e3a9e;}
+  .auth-error{color:#ff8f8f;font-size:13px;min-height:18px;margin-top:4px;}
+
+  /* ---------- Таблица рекордов ---------- */
+  .lb-list{
+    margin-top:8px;overflow-y:auto;max-height:52vh;text-align:left;
+    display:flex;flex-direction:column;gap:6px;padding-right:4px;
+  }
+  .lb-row{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:9px 12px;border-radius:10px;
+    background:rgba(255,255,255,.05);font-size:14px;
+  }
+  .lb-row.me{background:rgba(91,134,255,.22);border:1px solid rgba(91,134,255,.5);}
+  .lb-row .place{font-weight:800;color:#8ea0cc;min-width:32px;}
+  .lb-row .nick{flex:1;margin:0 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .lb-row .score{font-weight:800;color:#7dffb0;}
+  .lb-row .medal{font-size:16px;}
+</style>
+</head>
+<body>
+
+<div class="game">
+  <div class="user-bar">
+    <span>👤 <b id="userNick">—</b></span>
+    <button id="logoutBtn">Выйти</button>
+  </div>
+
+  <div class="credits">by <span>charodeychikmsm</span></div>
+
+  <div class="top">
+    <div class="stat">
+      <div class="label">Очки</div>
+      <div class="value" id="score">0</div>
+    </div>
+    <div class="stat">
+      <div class="label">Рекорд</div>
+      <div class="value" id="best">0</div>
+      <button class="gear" id="gearBtn" title="Таблица рекордов">⚙</button>
+    </div>
+    <button id="restart">Заново</button>
+  </div>
+
+  <div class="board" id="board"></div>
+  <div class="tray" id="tray"></div>
+</div>
+
+<!-- Игра окончена -->
+<div class="overlay hidden" id="overlay">
+  <div class="modal">
+    <h2>Игра окончена</h2>
+    <p>Больше некуда поставить фигуры</p>
+    <div class="big" id="finalScore">0</div>
+    <p>Ваш результат</p>
+    <button id="playAgain">Играть снова</button>
+  </div>
+</div>
+
+<!-- Таблица рекордов -->
+<div class="overlay hidden" id="lbOverlay">
+  <div class="modal">
+    <h2>🏆 Таблица рекордов</h2>
+    <div class="lb-list" id="lbList">Загрузка...</div>
+    <button id="lbClose">Закрыть</button>
+  </div>
+</div>
+
+<!-- Авторизация -->
+<div class="overlay" id="authOverlay">
+  <div class="auth-box">
+    <h2>Block Blast</h2>
+    <div class="sub">by charodeychikmsm</div>
+    <div class="tabs">
+      <button class="tab active" data-tab="login" type="button">Вход</button>
+      <button class="tab" data-tab="register" type="button">Регистрация</button>
+    </div>
+    <form id="authForm">
+      <input id="authNick" placeholder="Ник" maxlength="20" autocomplete="username">
+      <input id="authPass" type="password" placeholder="Пароль" autocomplete="current-password">
+      <button type="submit" id="authSubmit">Войти</button>
+      <div class="auth-error" id="authError"></div>
+    </form>
+  </div>
+</div>
+
+<div id="error-box" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(10,5,20,.96);color:#ffd0d0;padding:24px;font:14px/1.5 monospace;overflow:auto;"></div>
+
+<script>
+(function(){
+  'use strict';
+
+  // ============== АВТОРИЗАЦИЯ ==============
+  const authOverlay = document.getElementById('authOverlay');
+  const authForm    = document.getElementById('authForm');
+  const authNick    = document.getElementById('authNick');
+  const authPass    = document.getElementById('authPass');
+  const authError   = document.getElementById('authError');
+  const authSubmit  = document.getElementById('authSubmit');
+  const userNickEl  = document.getElementById('userNick');
+  const logoutBtn   = document.getElementById('logoutBtn');
+  const gearBtn     = document.getElementById('gearBtn');
+  const lbOverlay   = document.getElementById('lbOverlay');
+  const lbList      = document.getElementById('lbList');
+  const lbClose     = document.getElementById('lbClose');
+
+  let authMode = 'login'; // 'login' | 'register'
+  let currentUser = null; // {nick, best, token}
+
+  document.querySelectorAll('.tabs .tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tabs .tab').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      authMode = t.dataset.tab;
+      authSubmit.textContent = authMode === 'login' ? 'Войти' : 'Зарегистрироваться';
+      authError.textContent = '';
+      authPass.setAttribute('autocomplete', authMode === 'login' ? 'current-password' : 'new-password');
+    });
+  });
+
+  async function api(path, opts) {
+    opts = opts || {};
+    opts.headers = Object.assign({ 'Content-Type': 'application/json' }, opts.headers || {});
+    const r = await fetch(path, opts);
+    let data = null;
+    try { data = await r.json(); } catch(e){}
+    return { ok: r.ok, status: r.status, data: data || {} };
+  }
+
+  authForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    authError.textContent = '';
+    const nick = authNick.value.trim();
+    const pass = authPass.value;
+    if (!nick || !pass) { authError.textContent = 'Заполните все поля'; return; }
+    authSubmit.disabled = true;
+    authSubmit.textContent = '...';
+
+    const path = authMode === 'login' ? '/api/login' : '/api/register';
+    const res = await api(path, { method: 'POST', body: JSON.stringify({ nick, password: pass }) });
+
+    authSubmit.disabled = false;
+    authSubmit.textContent = authMode === 'login' ? 'Войти' : 'Зарегистрироваться';
+
+    if (!res.ok) {
+      authError.textContent = res.data.error || 'Ошибка';
+      return;
+    }
+
+    currentUser = { nick: res.data.nick, best: res.data.best || 0, token: res.data.token };
+    try { localStorage.setItem('bb_token', currentUser.token); } catch(e){}
+    enterGame();
+  });
+
+  logoutBtn.addEventListener('click', () => {
+    currentUser = null;
+    try { localStorage.removeItem('bb_token'); } catch(e){}
+    authOverlay.classList.remove('hidden');
+    authOverlay.style.opacity = '1';
+    authOverlay.style.pointerEvents = 'auto';
+    userNickEl.textContent = '—';
+    authPass.value = '';
+  });
+
+  function enterGame() {
+    userNickEl.textContent = currentUser.nick;
+    bestEl.textContent = currentUser.best || 0;
+    authOverlay.classList.add('hidden');
+    authOverlay.style.opacity = '0';
+    authOverlay.style.pointerEvents = 'none';
+    startGame();
+  }
+
+  async function tryAutoLogin() {
+    let token = null;
+    try { token = localStorage.getItem('bb_token'); } catch(e){}
+    if (!token) return false;
+    const res = await api('/api/me', { headers: { 'x-token': token } });
+    if (!res.ok) { try { localStorage.removeItem('bb_token'); } catch(e){} return false; }
+    currentUser = { nick: res.data.nick, best: res.data.best || 0, token };
+    return true;
+  }
+
+  // ============== ТАБЛИЦА РЕКОРДОВ ==============
+  gearBtn.addEventListener('click', async () => {
+    lbOverlay.classList.remove('hidden');
+    lbList.innerHTML = 'Загрузка...';
+    const res = await api('/api/leaderboard');
+    if (!res.ok || !res.data.leaderboard) {
+      lbList.innerHTML = '<div style="padding:12px;color:#ff8f8f;">Не удалось загрузить</div>';
+      return;
+    }
+    const list = res.data.leaderboard;
+    if (list.length === 0) {
+      lbList.innerHTML = '<div style="padding:12px;color:#8ea0cc;">Пока пусто</div>';
+      return;
+    }
+    lbList.innerHTML = '';
+    list.forEach((u, i) => {
+      const row = document.createElement('div');
+      row.className = 'lb-row' + (currentUser && u.nick.toLowerCase() === currentUser.nick.toLowerCase() ? ' me' : '');
+      let medal = '';
+      if (i === 0) medal = '🥇';
+      else if (i === 1) medal = '🥈';
+      else if (i === 2) medal = '🥉';
+      row.innerHTML =
+        '<span class="place">' + (medal || ('#' + (i + 1))) + '</span>' +
+        '<span class="nick">' + escapeHtml(u.nick) + '</span>' +
+        '<span class="score">' + u.best + '</span>';
+      lbList.appendChild(row);
+    });
+  });
+
+  lbClose.addEventListener('click', () => lbOverlay.classList.add('hidden'));
+  lbOverlay.addEventListener('click', (e) => { if (e.target === lbOverlay) lbOverlay.classList.add('hidden'); });
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, ch => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[ch]));
+  }
+
+  // ============== ОТПРАВКА СЧЁТА (debounce) ==============
+  let scoreSendTimer = null;
+  function scheduleSubmitScore(s) {
+    if (!currentUser) return;
+    if (scoreSendTimer) clearTimeout(scoreSendTimer);
+    scoreSendTimer = setTimeout(async () => {
+      const res = await api('/api/score', {
+        method: 'POST',
+        headers: { 'x-token': currentUser.token },
+        body: JSON.stringify({ score: s })
+      });
+      if (res.ok && res.data.best !== undefined) {
+        currentUser.best = res.data.best;
+        if (res.data.best > Number(bestEl.textContent)) bestEl.textContent = res.data.best;
+      }
+    }, 1200);
+  }
+
+  // ============== ИГРА ==============
+  const SIZE = 8, GAP = 4, PLACE_POINTS = 5;
+  const COLORS = ['#ff4d6d','#ff9f1c','#ffd60a','#4ade80','#22d3ee','#3b82f6','#a855f7','#f472b6'];
+  const SHAPES = [
+    {g:["X"],w:2},{g:["XX"],w:4},{g:["X","X"],w:4},{g:["XXX"],w:3},{g:["X","X","X"],w:3},
+    {g:["XX","XX"],w:3},{g:["XX","X."],w:2},{g:["XX",".X"],w:2},{g:["X.","XX"],w:2},{g:[".X","XX"],w:2},
+    {g:["XXXX"],w:1},{g:["X","X","X","X"],w:1},{g:["XXX","XXX"],w:1},{g:["XX","XX","XX"],w:1},
+    {g:["XXX","XXX","XXX"],w:1},{g:["X..","X..","XXX"],w:1},{g:["..X","..X","XXX"],w:1},
+    {g:["XXX","X..","X.."],w:1},{g:["XXX","..X","..X"],w:1},{g:["XXX",".X."],w:1},{g:[".X.","XXX"],w:1},
+    {g:["X.","XX","X."],w:1},{g:[".X","XX",".X"],w:1},{g:[".XX","XX."],w:1},{g:["XX.",".XX"],w:1},
+    {g:["X.","XX",".X"],w:1},{g:[".X","XX","X."],w:1}
+  ];
+  const POOL = [];
+  SHAPES.forEach(s => { for (let i = 0; i < s.w; i++) POOL.push(s.g); });
+
+  const boardEl = document.getElementById('board');
+  const trayEl  = document.getElementById('tray');
+  const scoreEl = document.getElementById('score');
+  const bestEl  = document.getElementById('best');
+  const overlay = document.getElementById('overlay');
+  const finalEl = document.getElementById('finalScore');
+
+  let grid, tray, score = 0;
+  let gameOver = false, busy = false, drag = null;
+  let cellEls = [], slotEls = [], previewCells = [];
+
+  for (let r = 0; r < SIZE; r++) {
+    cellEls[r] = [];
+    for (let c = 0; c < SIZE; c++) {
+      const d = document.createElement('div');
+      d.className = 'cell';
+      boardEl.appendChild(d);
+      cellEls[r][c] = d;
+    }
+  }
+
+  function rgba(hex, a) {
+    const n = parseInt(hex.slice(1), 16);
+    return 'rgba(' + ((n>>16)&255) + ',' + ((n>>8)&255) + ',' + (n&255) + ',' + a + ')';
+  }
+  function boardMetrics() {
+    const a = cellEls[0][0].getBoundingClientRect();
+    const b = cellEls[0][1].getBoundingClientRect();
+    const cs = a.width || 30;
+    const step = (b.left - a.left) || (cs + GAP);
+    return { cs, step, x: a.left, y: a.top };
+  }
+  function trayCellSize() {
+    return Math.max(11, Math.round(boardMetrics().cs * 0.52));
+  }
+  function makePiece() {
+    const g = POOL[Math.floor(Math.random() * POOL.length)];
+    const h = g.length, w = g[0].length;
+    const cells = [];
+    for (let r = 0; r < h; r++)
+      for (let c = 0; c < w; c++)
+        if (g[r][c] === 'X') cells.push([r, c]);
+    return { h, w, cells, color: COLORS[Math.floor(Math.random()*COLORS.length)], used: false };
+  }
+  function pieceEl(p, cs, gap) {
+    const el = document.createElement('div');
+    el.style.display = 'grid';
+    el.style.gridTemplateColumns = 'repeat(' + p.w + ',' + cs + 'px)';
+    el.style.gridTemplateRows    = 'repeat(' + p.h + ',' + cs + 'px)';
+    el.style.gap = gap + 'px';
+    for (const [r, c] of p.cells) {
+      const d = document.createElement('div');
+      d.className = 'blk';
+      d.style.width = cs + 'px';
+      d.style.height = cs + 'px';
+      d.style.gridRow = (r + 1);
+      d.style.gridColumn = (c + 1);
+      d.style.background = p.color;
+      el.appendChild(d);
+    }
+    return el;
+  }
+  function renderBoard() {
+    for (let r = 0; r < SIZE; r++)
+      for (let c = 0; c < SIZE; c++) {
+        const el = cellEls[r][c], v = grid[r][c];
+        if (v) { el.style.background = v; el.classList.add('filled'); }
+        else   { el.style.background = ''; el.classList.remove('filled'); }
+      }
+  }
+  function renderTray() {
+    trayEl.innerHTML = '';
+    slotEls = [];
+    const cs = trayCellSize();
+    for (let i = 0; i < 3; i++) {
+      const slot = document.createElement('div');
+      slot.className = 'slot';
+      const p = tray[i];
+      if (p && !p.used) {
+        const el = pieceEl(p, cs, GAP);
+        el.classList.add('piece');
+        (function(idx){ el.addEventListener('pointerdown', e => onPointerDown(e, idx)); })(i);
+        slot.appendChild(el);
+      }
+      trayEl.appendChild(slot);
+      slotEls.push(slot);
+    }
+  }
+  function addScore(n) {
+    score += n;
+    scoreEl.textContent = score;
+    const pop = document.createElement('div');
+    pop.className = 'pop';
+    pop.textContent = '+' + n;
+    scoreEl.parentElement.appendChild(pop);
+    setTimeout(() => pop.remove(), 860);
+
+    if (currentUser && score > (currentUser.best || 0)) {
+      currentUser.best = score;
+      bestEl.textContent = best;
+      scheduleSubmitScore(score);
+    }
+  }
+  function clearPreview() {
+    for (const [r, c] of previewCells) {
+      const el = cellEls[r][c];
+      el.classList.remove('preview');
+      if (!grid[r][c]) el.style.background = '';
+    }
+    previewCells = [];
+  }
+  function onPointerDown(e, index) {
+    if (gameOver || busy || drag) return;
+    const piece = tray[index];
+    if (!piece || piece.used) return;
+    e.preventDefault();
+    const m = boardMetrics();
+    const ghost = pieceEl(piece, m.cs, GAP);
+    ghost.classList.add('ghost');
+    document.body.appendChild(ghost);
+    drag = {
+      index, piece, ghost, pid: e.pointerId,
+      touch: e.pointerType === 'touch',
+      w: piece.w * (m.cs + GAP) - GAP,
+      h: piece.h * (m.cs + GAP) - GAP,
+      gx: 0, gy: 0, target: null
+    };
+    if (slotEls[index]) slotEls[index].style.opacity = '0.25';
+    moveGhost(e.clientX, e.clientY);
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
+  }
+  function moveGhost(x, y) {
+    const lift = drag.touch ? 60 : 0;
+    drag.gx = x - drag.w / 2;
+    drag.gy = y - drag.h / 2 - lift;
+    drag.ghost.style.left = drag.gx + 'px';
+    drag.ghost.style.top  = drag.gy + 'px';
+    updatePreview();
+  }
+  function updatePreview() {
+    clearPreview();
+    if (!drag) return;
+    drag.target = null;
+    const m = boardMetrics();
+    const col = Math.round((drag.gx - m.x) / m.step);
+    const row = Math.round((drag.gy - m.y) / m.step);
+    const cells = [];
+    for (const [dr, dc] of drag.piece.cells) {
+      const r = row + dr, c = col + dc;
+      if (r < 0 || r >= SIZE || c < 0 || c >= SIZE || grid[r][c]) return;
+      cells.push([r, c]);
+    }
+    drag.target = { row, col };
+    for (const [r, c] of cells) {
+      const el = cellEls[r][c];
+      el.style.background = rgba(drag.piece.color, 0.5);
+      el.classList.add('preview');
+      previewCells.push([r, c]);
+    }
+  }
+  function onPointerMove(e) {
+    if (!drag || e.pointerId !== drag.pid) return;
+    e.preventDefault();
+    moveGhost(e.clientX, e.clientY);
+  }
+  function onPointerUp(e) {
+    if (!drag || e.pointerId !== drag.pid) return;
+    window.removeEventListener('pointermove', onPointerMove);
+    window.removeEventListener('pointerup', onPointerUp);
+    window.removeEventListener('pointercancel', onPointerUp);
+    const d = drag; drag = null;
+    d.ghost.remove();
+    clearPreview();
+    if (slotEls[d.index]) slotEls[d.index].style.opacity = '';
+    if (d.target) placePiece(d.index, d.piece, d.target.row, d.target.col);
+  }
+  function placePiece(index, piece, row, col) {
+    busy = true;
+    for (const [dr, dc] of piece.cells) grid[row + dr][col + dc] = piece.color;
+    piece.used = true;
+    addScore(PLACE_POINTS);
+    renderBoard();
+    renderTray();
+    resolveLines();
+  }
+  function resolveLines() {
+    const rows = [], cols = [];
+    for (let r = 0; r < SIZE; r++) {
+      let full = true;
+      for (let c = 0; c < SIZE; c++) if (!grid[r][c]) { full = false; break; }
+      if (full) rows.push(r);
+    }
+    for (let c = 0; c < SIZE; c++) {
+      let full = true;
+      for (let r = 0; r < SIZE; r++) if (!grid[r][c]) { full = false; break; }
+      if (full) cols.push(c);
+    }
+    const total = rows.length + cols.length;
+    if (!total) { finishTurn(); return; }
+    addScore(total * 10 + Math.max(0, total - 1) * 15);
+    const toClear = new Set();
+    rows.forEach(r => { for (let c = 0; c < SIZE; c++) toClear.add(r * SIZE + c); });
+    cols.forEach(c => { for (let r = 0; r < SIZE; r++) toClear.add(r * SIZE + c); });
+    toClear.forEach(k => cellEls[Math.floor(k/SIZE)][k % SIZE].classList.add('clear'));
+    setTimeout(() => {
+      toClear.forEach(k => {
+        const r = Math.floor(k/SIZE), c = k % SIZE;
+        grid[r][c] = null;
+        cellEls[r][c].classList.remove('clear');
+      });
+      renderBoard();
+      finishTurn();
+    }, 250);
+  }
+  function finishTurn() {
+    busy = false;
+    if (tray.every(p => p.used)) {
+      tray = [makePiece(), makePiece(), makePiece()];
+      renderTray();
+    }
+    checkGameOver();
+  }
+  function canPlaceAnywhere(p) {
+    if (!p) return false;
+    for (let r = 0; r + p.h <= SIZE; r++)
+      for (let c = 0; c + p.w <= SIZE; c++) {
+        let ok = true;
+        for (const [dr, dc] of p.cells) {
+          if (grid[r + dr][c + dc]) { ok = false; break; }
+        }
+        if (ok) return true;
+      }
+    return false;
+  }
+  function checkGameOver() {
+    if (gameOver) return;
+    if (!tray.some(p => !p.used && canPlaceAnywhere(p))) {
+      gameOver = true;
+      finalEl.textContent = score;
+      overlay.classList.remove('hidden');
+      if (currentUser) scheduleSubmitScore(score);
+    }
+  }
+  function startGame() {
+    grid = [];
+    for (let r = 0; r < SIZE; r++) grid.push(new Array(SIZE).fill(null));
+    score = 0;
+    gameOver = false;
+    busy = false;
+    drag = null;
+    previewCells = [];
+    scoreEl.textContent = '0';
+    overlay.classList.add('hidden');
+    tray = [makePiece(), makePiece(), makePiece()];
+    renderBoard();
+    renderTray();
+  }
+
+  document.getElementById('restart').addEventListener('click', startGame);
+  document.getElementById('playAgain').addEventListener('click', startGame);
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  window.addEventListener('resize', () => { if (!drag && !gameOver) renderTray(); });
+
+  // ============== СТАРТ ==============
+  (async function boot() {
+    const ok = await tryAutoLogin();
+    if (ok) enterGame();
+  })();
+
+})();
+</script>
+</body>
+</html>
