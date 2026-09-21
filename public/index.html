@@ -24,11 +24,20 @@
     font-size:13px;
   }
   .user-bar b{color:#7dffb0;}
+  .user-bar .bar-right{display:flex;gap:6px;}
   .user-bar button{
-    border:none;background:rgba(255,90,90,.18);color:#ffb3b3;
+    border:none;background:rgba(255,255,255,.1);color:#eaf0ff;
     padding:5px 10px;border-radius:8px;font:600 12px/1 inherit;cursor:pointer;
+    transition:background .15s;
   }
-  .user-bar button:hover{background:rgba(255,90,90,.3);}
+  .user-bar button:hover{background:rgba(255,255,255,.2);}
+  .user-bar button.danger{background:rgba(255,90,90,.18);color:#ffb3b3;}
+  .user-bar button.danger:hover{background:rgba(255,90,90,.3);}
+  .user-bar button.help{
+    width:26px;padding:0;height:26px;border-radius:50%;
+    background:rgba(91,134,255,.25);color:#c9d6ff;font-weight:800;
+  }
+  .user-bar button.help:hover{background:rgba(91,134,255,.5);}
 
   .credits{
     text-align:center;font-size:12px;font-weight:700;letter-spacing:.08em;
@@ -106,7 +115,7 @@
   }
   .overlay.hidden{opacity:0;pointer-events:none;}
   .modal{
-    width:min(90vw,360px);text-align:center;padding:24px 22px;border-radius:22px;
+    width:min(90vw,400px);text-align:center;padding:24px 22px;border-radius:22px;
     background:linear-gradient(180deg,#232f63,#151c3d);
     border:1px solid rgba(255,255,255,.12);
     box-shadow:0 24px 60px rgba(0,0,0,.6);
@@ -115,15 +124,15 @@
   .modal h2{margin:0 0 6px;font-size:22px;}
   .modal p{margin:4px 0 12px;color:#a9b7dd;font-size:14px;}
   .modal .big{font-size:40px;font-weight:900;color:#7dffb0;line-height:1;}
-  .modal button{
+  .modal > button{
     margin-top:14px;width:100%;border:none;border-radius:14px;padding:14px;cursor:pointer;
     font:700 15px/1 inherit;color:#fff;
     background:linear-gradient(180deg,#5b86ff,#3358dc);
     box-shadow:0 4px 0 #1e3a9e;
   }
-  .modal button:active{transform:translateY(3px);box-shadow:0 1px 0 #1e3a9e;}
+  .modal > button:active{transform:translateY(3px);box-shadow:0 1px 0 #1e3a9e;}
 
-  /* ---------- Авторизация ---------- */
+  /* Авторизация */
   .auth-box{
     width:min(90vw,340px);padding:26px 22px;border-radius:22px;
     background:linear-gradient(180deg,#232f63,#151c3d);
@@ -155,7 +164,7 @@
   #authSubmit:active{transform:translateY(3px);box-shadow:0 1px 0 #1e3a9e;}
   .auth-error{color:#ff8f8f;font-size:13px;min-height:18px;margin-top:4px;}
 
-  /* ---------- Таблица рекордов ---------- */
+  /* Таблица рекордов */
   .lb-list{
     margin-top:8px;overflow-y:auto;max-height:52vh;text-align:left;
     display:flex;flex-direction:column;gap:6px;padding-right:4px;
@@ -169,15 +178,67 @@
   .lb-row .place{font-weight:800;color:#8ea0cc;min-width:32px;}
   .lb-row .nick{flex:1;margin:0 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .lb-row .score{font-weight:800;color:#7dffb0;}
-  .lb-row .medal{font-size:16px;}
+
+  /* Отзывы */
+  .fb-form{
+    display:flex;flex-direction:column;gap:8px;margin-bottom:12px;
+  }
+  .fb-form textarea{
+    width:100%;min-height:70px;resize:vertical;
+    padding:10px 12px;border-radius:12px;
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(0,0,0,.28);color:#eaf0ff;
+    font:500 14px/1.4 inherit;outline:none;
+  }
+  .fb-form textarea:focus{border-color:#5b86ff;}
+  .fb-form button{
+    padding:11px;border:none;border-radius:12px;cursor:pointer;
+    font:700 14px/1 inherit;color:#fff;
+    background:linear-gradient(180deg,#5b86ff,#3358dc);
+    box-shadow:0 3px 0 #1e3a9e;
+  }
+  .fb-form button:disabled{opacity:.5;cursor:not-allowed;box-shadow:none;transform:none;}
+  .fb-hint{font-size:12px;color:#8ea0cc;text-align:center;min-height:16px;}
+  .fb-list{
+    flex:1;overflow-y:auto;max-height:44vh;text-align:left;
+    display:flex;flex-direction:column;gap:8px;padding-right:4px;
+  }
+  .fb-item{
+    background:rgba(255,255,255,.05);border-radius:12px;padding:10px 12px;
+    display:flex;gap:10px;align-items:flex-start;
+  }
+  .fb-item.mine{background:rgba(91,134,255,.14);}
+  .fb-like{
+    display:flex;flex-direction:column;align-items:center;gap:2px;
+    background:rgba(0,0,0,.25);border:none;border-radius:10px;
+    padding:6px 8px;color:#eaf0ff;cursor:pointer;font:700 12px/1 inherit;
+    min-width:46px;transition:background .15s;
+  }
+  .fb-like:hover{background:rgba(91,134,255,.35);}
+  .fb-like.liked{background:rgba(91,134,255,.55);}
+  .fb-like .arr{font-size:14px;}
+  .fb-body{flex:1;min-width:0;}
+  .fb-meta{font-size:11px;color:#8ea0cc;margin-bottom:4px;display:flex;justify-content:space-between;gap:6px;}
+  .fb-meta b{color:#c9d6ff;}
+  .fb-text{font-size:14px;line-height:1.35;word-wrap:break-word;overflow-wrap:break-word;}
+
+  #error-box{
+    display:none;position:fixed;inset:0;z-index:9999;
+    background:rgba(10,5,20,.96);color:#ffd0d0;
+    padding:24px;font:14px/1.5 monospace;overflow:auto;
+  }
 </style>
 </head>
 <body>
 
 <div class="game">
+
   <div class="user-bar">
     <span>👤 <b id="userNick">—</b></span>
-    <button id="logoutBtn">Выйти</button>
+    <div class="bar-right">
+      <button id="feedbackBtn" class="help" title="Отзывы и предложения">?</button>
+      <button id="logoutBtn" class="danger">Выйти</button>
+    </div>
   </div>
 
   <div class="credits">by <span>charodeychikmsm</span></div>
@@ -189,7 +250,7 @@
     </div>
     <div class="stat">
       <div class="label">Рекорд</div>
-      <div class="value" id="best">0</div>
+      <div class="value" id="bestVal">0</div>
       <button class="gear" id="gearBtn" title="Таблица рекордов">⚙</button>
     </div>
     <button id="restart">Заново</button>
@@ -219,6 +280,23 @@
   </div>
 </div>
 
+<!-- Отзывы -->
+<div class="overlay hidden" id="fbOverlay">
+  <div class="modal">
+    <h2>💡 Отзывы и предложения</h2>
+    <p style="margin-bottom:10px;">Идеи, что добавить. Голосуйте за лучшие!<br>
+      <span style="font-size:12px;color:#8ea0cc;">Отзывы живут 3 дня, постить — раз в сутки.</span>
+    </p>
+    <div class="fb-form">
+      <textarea id="fbText" maxlength="500" placeholder="Напишите идею, предложение или проблему..."></textarea>
+      <button id="fbSubmit">Отправить</button>
+      <div class="fb-hint" id="fbHint"></div>
+    </div>
+    <div class="fb-list" id="fbList">Загрузка...</div>
+    <button id="fbClose">Закрыть</button>
+  </div>
+</div>
+
 <!-- Авторизация -->
 <div class="overlay" id="authOverlay">
   <div class="auth-box">
@@ -237,11 +315,52 @@
   </div>
 </div>
 
-<div id="error-box" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(10,5,20,.96);color:#ffd0d0;padding:24px;font:14px/1.5 monospace;overflow:auto;"></div>
+<div id="error-box"></div>
 
 <script>
 (function(){
   'use strict';
+
+  // ============== ЗВУКИ (Web Audio API) ==============
+  let audioCtx = null;
+  function getAudio() {
+    if (!audioCtx) {
+      try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+      catch(e){ audioCtx = null; }
+    }
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
+
+  function tone(freq, dur, vol, type, delay) {
+    const ctx = getAudio();
+    if (!ctx) return;
+    const t = ctx.currentTime + (delay || 0);
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freq, t);
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(vol, t + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + dur + 0.05);
+  }
+
+  // Тихий мягкий звук установки блока
+  function soundPlace() {
+    tone(392, 0.10, 0.045, 'sine', 0);
+    tone(587, 0.08, 0.025, 'sine', 0.02);
+  }
+  // Спокойный аккорд при очистке линий
+  function soundClear() {
+    tone(523.25, 0.45, 0.06, 'sine', 0);
+    tone(659.25, 0.42, 0.05, 'sine', 0.04);
+    tone(783.99, 0.50, 0.045, 'sine', 0.08);
+    tone(1046.5, 0.45, 0.03, 'sine', 0.14);
+  }
 
   // ============== АВТОРИЗАЦИЯ ==============
   const authOverlay = document.getElementById('authOverlay');
@@ -256,9 +375,16 @@
   const lbOverlay   = document.getElementById('lbOverlay');
   const lbList      = document.getElementById('lbList');
   const lbClose     = document.getElementById('lbClose');
+  const feedbackBtn = document.getElementById('feedbackBtn');
+  const fbOverlay   = document.getElementById('fbOverlay');
+  const fbList      = document.getElementById('fbList');
+  const fbText      = document.getElementById('fbText');
+  const fbSubmit    = document.getElementById('fbSubmit');
+  const fbHint      = document.getElementById('fbHint');
+  const fbClose     = document.getElementById('fbClose');
 
-  let authMode = 'login'; // 'login' | 'register'
-  let currentUser = null; // {nick, best, token}
+  let authMode = 'login';
+  let currentUser = null;
 
   document.querySelectorAll('.tabs .tab').forEach(t => {
     t.addEventListener('click', () => {
@@ -288,20 +414,14 @@
     if (!nick || !pass) { authError.textContent = 'Заполните все поля'; return; }
     authSubmit.disabled = true;
     authSubmit.textContent = '...';
-
     const path = authMode === 'login' ? '/api/login' : '/api/register';
     const res = await api(path, { method: 'POST', body: JSON.stringify({ nick, password: pass }) });
-
     authSubmit.disabled = false;
     authSubmit.textContent = authMode === 'login' ? 'Войти' : 'Зарегистрироваться';
-
-    if (!res.ok) {
-      authError.textContent = res.data.error || 'Ошибка';
-      return;
-    }
-
+    if (!res.ok) { authError.textContent = res.data.error || 'Ошибка'; return; }
     currentUser = { nick: res.data.nick, best: res.data.best || 0, token: res.data.token };
     try { localStorage.setItem('bb_token', currentUser.token); } catch(e){}
+    getAudio(); // разблокируем аудио после жеста
     enterGame();
   });
 
@@ -353,9 +473,7 @@
       const row = document.createElement('div');
       row.className = 'lb-row' + (currentUser && u.nick.toLowerCase() === currentUser.nick.toLowerCase() ? ' me' : '');
       let medal = '';
-      if (i === 0) medal = '🥇';
-      else if (i === 1) medal = '🥈';
-      else if (i === 2) medal = '🥉';
+      if (i === 0) medal = '🥇'; else if (i === 1) medal = '🥈'; else if (i === 2) medal = '🥉';
       row.innerHTML =
         '<span class="place">' + (medal || ('#' + (i + 1))) + '</span>' +
         '<span class="nick">' + escapeHtml(u.nick) + '</span>' +
@@ -363,15 +481,123 @@
       lbList.appendChild(row);
     });
   });
-
   lbClose.addEventListener('click', () => lbOverlay.classList.add('hidden'));
-  lbOverlay.addEventListener('click', (e) => { if (e.target === lbOverlay) lbOverlay.classList.add('hidden'); });
+  lbOverlay.addEventListener('click', e => { if (e.target === lbOverlay) lbOverlay.classList.add('hidden'); });
+
+  // ============== ОТЗЫВЫ ==============
+  feedbackBtn.addEventListener('click', openFeedback);
+  fbClose.addEventListener('click', () => fbOverlay.classList.add('hidden'));
+  fbOverlay.addEventListener('click', e => { if (e.target === fbOverlay) fbOverlay.classList.add('hidden'); });
+
+  async function openFeedback() {
+    fbOverlay.classList.remove('hidden');
+    fbList.innerHTML = 'Загрузка...';
+    fbText.value = '';
+    fbHint.textContent = '';
+    await loadFeedback();
+  }
+
+  async function loadFeedback() {
+    const res = await api('/api/feedback', { headers: { 'x-token': currentUser.token } });
+    if (!res.ok) {
+      fbList.innerHTML = '<div style="padding:12px;color:#ff8f8f;">' + (res.data.error || 'Ошибка') + '</div>';
+      return;
+    }
+    const { feedback, canPostIn } = res.data;
+
+    // Обновляем поле ввода
+    if (canPostIn > 0) {
+      const h = Math.ceil(canPostIn / 3600000);
+      fbSubmit.disabled = true;
+      fbText.disabled = true;
+      fbText.placeholder = 'Вы уже писали. Следующий отзыв через ' + h + ' ч.';
+      fbHint.textContent = 'Лимит: 1 отзыв в 24 часа';
+    } else {
+      fbSubmit.disabled = false;
+      fbText.disabled = false;
+      fbText.placeholder = 'Напишите идею, предложение или проблему...';
+      fbHint.textContent = '';
+    }
+
+    // Список
+    if (!feedback || feedback.length === 0) {
+      fbList.innerHTML = '<div style="padding:12px;color:#8ea0cc;">Пока отзывов нет — будьте первым!</div>';
+      return;
+    }
+
+    fbList.innerHTML = '';
+    feedback.forEach(f => {
+      const item = document.createElement('div');
+      item.className = 'fb-item' + (f.mine ? ' mine' : '');
+
+      const likeBtn = document.createElement('button');
+      likeBtn.className = 'fb-like' + (f.liked ? ' liked' : '');
+      likeBtn.type = 'button';
+      likeBtn.innerHTML = '<span class="arr">▲</span><span>' + f.likes + '</span>';
+      likeBtn.title = f.liked ? 'Убрать голос' : 'Голосовать';
+      likeBtn.addEventListener('click', async () => {
+        likeBtn.disabled = true;
+        const r = await api('/api/feedback/' + f.id + '/like', {
+          method: 'POST',
+          headers: { 'x-token': currentUser.token }
+        });
+        likeBtn.disabled = false;
+        if (r.ok) {
+          f.likes = r.data.likes;
+          f.liked = r.data.liked;
+          likeBtn.classList.toggle('liked', f.liked);
+          likeBtn.innerHTML = '<span class="arr">▲</span><span>' + f.likes + '</span>';
+        }
+      });
+
+      const body = document.createElement('div');
+      body.className = 'fb-body';
+      const ago = timeAgo(f.createdAt);
+      body.innerHTML =
+        '<div class="fb-meta"><b>' + escapeHtml(f.nick) + '</b><span>' + ago + '</span></div>' +
+        '<div class="fb-text">' + escapeHtml(f.text) + '</div>';
+
+      item.appendChild(likeBtn);
+      item.appendChild(body);
+      fbList.appendChild(item);
+    });
+  }
+
+  fbSubmit.addEventListener('click', async () => {
+    const text = fbText.value.trim();
+    if (text.length < 3) { fbHint.textContent = 'Минимум 3 символа'; return; }
+    fbSubmit.disabled = true;
+    fbHint.textContent = 'Отправка...';
+    const res = await api('/api/feedback', {
+      method: 'POST',
+      headers: { 'x-token': currentUser.token },
+      body: JSON.stringify({ text })
+    });
+    if (!res.ok) {
+      fbHint.textContent = res.data.error || 'Ошибка';
+      fbSubmit.disabled = false;
+      return;
+    }
+    fbText.value = '';
+    await loadFeedback();
+  });
+
+  function timeAgo(ts) {
+    const diff = Date.now() - ts;
+    const m = Math.floor(diff / 60000);
+    if (m < 1) return 'только что';
+    if (m < 60) return m + ' мин назад';
+    const h = Math.floor(m / 60);
+    if (h < 24) return h + ' ч назад';
+    const d = Math.floor(h / 24);
+    return d + ' д назад';
+  }
 
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, ch => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[ch]));
   }
 
-  // ============== ОТПРАВКА СЧЁТА (debounce) ==============
+  // ============== ОТПРАВКА СЧЁТА ==============
   let scoreSendTimer = null;
   function scheduleSubmitScore(s) {
     if (!currentUser) return;
@@ -407,7 +633,7 @@
   const boardEl = document.getElementById('board');
   const trayEl  = document.getElementById('tray');
   const scoreEl = document.getElementById('score');
-  const bestEl  = document.getElementById('best');
+  const bestEl  = document.getElementById('bestVal');
   const overlay = document.getElementById('overlay');
   const finalEl = document.getElementById('finalScore');
 
@@ -436,9 +662,7 @@
     const step = (b.left - a.left) || (cs + GAP);
     return { cs, step, x: a.left, y: a.top };
   }
-  function trayCellSize() {
-    return Math.max(11, Math.round(boardMetrics().cs * 0.52));
-  }
+  function trayCellSize() { return Math.max(11, Math.round(boardMetrics().cs * 0.52)); }
   function makePiece() {
     const g = POOL[Math.floor(Math.random() * POOL.length)];
     const h = g.length, w = g[0].length;
@@ -500,10 +724,9 @@
     pop.textContent = '+' + n;
     scoreEl.parentElement.appendChild(pop);
     setTimeout(() => pop.remove(), 860);
-
     if (currentUser && score > (currentUser.best || 0)) {
       currentUser.best = score;
-      bestEl.textContent = best;
+      bestEl.textContent = score;  // <-- ИСПРАВЛЕНО (было best)
       scheduleSubmitScore(score);
     }
   }
@@ -516,6 +739,7 @@
     previewCells = [];
   }
   function onPointerDown(e, index) {
+    getAudio(); // разблокировка звука по жесту
     if (gameOver || busy || drag) return;
     const piece = tray[index];
     if (!piece || piece.used) return;
@@ -587,6 +811,7 @@
     for (const [dr, dc] of piece.cells) grid[row + dr][col + dc] = piece.color;
     piece.used = true;
     addScore(PLACE_POINTS);
+    soundPlace(); // <-- звук установки
     renderBoard();
     renderTray();
     resolveLines();
@@ -606,6 +831,7 @@
     const total = rows.length + cols.length;
     if (!total) { finishTurn(); return; }
     addScore(total * 10 + Math.max(0, total - 1) * 15);
+    soundClear(); // <-- звук очистки линий
     const toClear = new Set();
     rows.forEach(r => { for (let c = 0; c < SIZE; c++) toClear.add(r * SIZE + c); });
     cols.forEach(c => { for (let r = 0; r < SIZE; r++) toClear.add(r * SIZE + c); });
